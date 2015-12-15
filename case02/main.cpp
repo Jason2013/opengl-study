@@ -25,7 +25,7 @@ int main()
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-		GlfwWinObj window(1024, 768, "Case 01");
+		GlfwWinObj window(1024, 768, "Case 02");
 
 		glfwMakeContextCurrent(window);
 
