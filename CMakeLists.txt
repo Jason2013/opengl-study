@@ -32,3 +32,14 @@ set_target_properties(case02 PROPERTIES
 )
 
 create_target_launcher(case02 WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/case02/")
+
+add_executable(case03 case03/main.cpp
+    common/shader.hpp
+    common/shader.cpp
+    common/globjs.h)
+
+set_target_properties(case03 PROPERTIES
+    COMPILE_DEFINITIONS GLEW_STATIC
+)
+
+create_target_launcher(case03 WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/case03/")
