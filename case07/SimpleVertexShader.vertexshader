@@ -1,0 +1,16 @@
+#version 330 core
+
+// Input vertex data, different for all executions of this shader.
+layout(location = 0) in vec2 vertexPosition_modelspace;
+
+uniform float scaleFactor;
+
+out vec2 xUV;
+layout(location = 1) in vec2 uv;
+
+void main(){
+
+    gl_Position = vec4(vertexPosition_modelspace * scaleFactor, 0.0, 1.0);
+    xUV = uv;
+}
+
