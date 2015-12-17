@@ -3,6 +3,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <string>
 
 class MyExcept
 {
@@ -33,6 +34,14 @@ class glExcept : public MyExcept
 {
 
 };
+
+class FileNotFound : public MyExcept
+{
+public:
+	FileNotFound(const char * filename):_filename(filename){}
+	std::string _filename;
+};
+
 
 class GlfwObj
 {
