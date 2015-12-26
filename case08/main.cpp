@@ -42,8 +42,13 @@ const char * FilterName[] = {
 GLint g_mag_filter = 1;
 GLint g_min_filter = 1;
 
+GLuint fbo;
+GLuint rbo[4];
+GLenum renderbuff[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+GLenum defaultbuff[1] = { GL_BACK };
 
-
+//bool g_useFbo = true;
+bool g_useFbo = false;
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -103,6 +108,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, FilterState[g_min_filter]);
 		std::cout << "GL_TEXTURE_MIN_FILTER=" << FilterName[g_min_filter] << std::endl;
 	}
+	else if (key == GLFW_KEY_F2 && (action == GLFW_PRESS || action == GLFW_REPEAT))
+	{
+		g_useFbo = !g_useFbo;
+		//g_min_filter += 1;
+		//if (g_min_filter >= sizeof(FilterState) / sizeof(FilterState[0]))
+		//	g_min_filter = 0;
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, FilterState[g_min_filter]);
+		std::cout << "g_useFbo=" << g_useFbo << std::endl;
+	}
+
 }
 
 GLuint LoadBmpTex(const char * szFileName)
@@ -133,6 +148,27 @@ GLuint LoadBmpTex(const char * szFileName)
 void SetupRC()
 {
 	//
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+
+	glGenRenderbuffers(4, rbo);
+
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo[0]);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, 1024, 768);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo[1]);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, 1024, 768);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo[2]);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, 1024, 768);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo[3]);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 1024, 768);
+
+	glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rbo[0]);
+	glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_RENDERBUFFER, rbo[1]);
+	glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_RENDERBUFFER, rbo[2]);
+	glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo[3]);
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
 }
 
 int main()
@@ -146,6 +182,7 @@ int main()
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		//glfwWindowHint(GLFW_DOUBLEBUFFER, )
 
 		GlfwWinObj window(1024, 768, "Case 08");
 
@@ -238,12 +275,55 @@ int main()
 		SetupRC();
 
 
+		GLint winbuff;
 		while (!glfwWindowShouldClose(window))
 		{
+			// save default render buffer
+			glGetIntegerv(GL_DRAW_BUFFER, &winbuff);
+
+			fprintf(stdout, "winbuff=%d, %d, g_useFbo=%d\n", winbuff, GL_BACK, g_useFbo);
+
+			if (g_useFbo)
+			{
+				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+				glDrawBuffers(3, renderbuff);
+				fprintf(stdout, "+++++++++++++++++++++++++++\n");
+				GLenum fboStatus =  glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+				GLenum fboStatusR = glCheckFramebufferStatus(GL_READ_FRAMEBUFFER);
+				fprintf(stdout, ">>>>   %d, %d, %d\n", fboStatus, fboStatusR, GL_FRAMEBUFFER_COMPLETE);
+
+			}
+
 			glClear(GL_COLOR_BUFFER_BIT);
 			glUniform1f(scaleFactor, g_scaleFactor);
 			glUniform1f(scaleFactorFrag, g_scaleFactorFrag);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+			if (g_useFbo)
+
+			{
+				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+				glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+
+				GLenum fboStatus = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+				GLenum fboStatusR = glCheckFramebufferStatus(GL_READ_FRAMEBUFFER);
+				fprintf(stdout, "<<<<   %d, %d, %d\n", fboStatus, fboStatusR, GL_FRAMEBUFFER_COMPLETE);
+
+
+				glReadBuffer(GL_COLOR_ATTACHMENT1);
+				glDrawBuffers(1, defaultbuff);
+				glViewport(0, 0, 1024, 768);
+				//glDrawBuffer(GL_BACK);
+
+				glBlitFramebuffer(0, 0, 1024 / 2, 768 / 2, 0, 0, 1024 / 2, 768 / 2, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+				fprintf(stdout, "----------------------------\n");
+				//glBindFramebuffer(gl_read_f)
+
+			}
+
+
+
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
