@@ -115,7 +115,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		//if (g_min_filter >= sizeof(FilterState) / sizeof(FilterState[0]))
 		//	g_min_filter = 0;
 		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, FilterState[g_min_filter]);
-		std::cout << "g_useFbo=" << g_useFbo << std::endl;
+		//std::cout << "g_useFbo=" << g_useFbo << std::endl;
 	}
 
 }
@@ -279,22 +279,30 @@ int main()
 		while (!glfwWindowShouldClose(window))
 		{
 			// save default render buffer
-			glGetIntegerv(GL_DRAW_BUFFER, &winbuff);
+			//glGetIntegerv(GL_DRAW_BUFFER, &winbuff);
 
-			fprintf(stdout, "winbuff=%d, %d, g_useFbo=%d\n", winbuff, GL_BACK, g_useFbo);
+			//fprintf(stdout, "winbuff=%d, %d, g_useFbo=%d\n", winbuff, GL_BACK, g_useFbo);
+			glClear(GL_COLOR_BUFFER_BIT);
 
 			if (g_useFbo)
 			{
 				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 				glDrawBuffers(3, renderbuff);
-				fprintf(stdout, "+++++++++++++++++++++++++++\n");
+				//fprintf(stdout, "+++++++++++++++++++++++++++\n");
 				GLenum fboStatus =  glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
 				GLenum fboStatusR = glCheckFramebufferStatus(GL_READ_FRAMEBUFFER);
-				fprintf(stdout, ">>>>   %d, %d, %d\n", fboStatus, fboStatusR, GL_FRAMEBUFFER_COMPLETE);
+				//fprintf(stdout, ">>>>   %d, %d, %d\n", fboStatus, fboStatusR, GL_FRAMEBUFFER_COMPLETE);
+
+				
+				GLfloat vClearColor[4];
+				glGetFloatv(GL_COLOR_CLEAR_VALUE, vClearColor);
+				glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+				glClear(GL_COLOR_BUFFER_BIT);
+				glClearColor(vClearColor[0], vClearColor[1], vClearColor[2], vClearColor[3]);
 
 			}
 
-			glClear(GL_COLOR_BUFFER_BIT);
+			//glClear(GL_COLOR_BUFFER_BIT);
 			glUniform1f(scaleFactor, g_scaleFactor);
 			glUniform1f(scaleFactorFrag, g_scaleFactorFrag);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -305,32 +313,23 @@ int main()
 				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 				glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
 
-				GLenum fboStatus = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
-				GLenum fboStatusR = glCheckFramebufferStatus(GL_READ_FRAMEBUFFER);
-				fprintf(stdout, "<<<<   %d, %d, %d\n", fboStatus, fboStatusR, GL_FRAMEBUFFER_COMPLETE);
+				//GLenum fboStatus = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+				//GLenum fboStatusR = glCheckFramebufferStatus(GL_READ_FRAMEBUFFER);
+				//fprintf(stdout, "<<<<   %d, %d, %d\n", fboStatus, fboStatusR, GL_FRAMEBUFFER_COMPLETE);
 
 				glDrawBuffer(GL_BACK);
 
 				glReadBuffer(GL_COLOR_ATTACHMENT1);
-				//glDrawBuffers(1, defaultbuff);
-				//glViewport(0, 0, 800, 700);
-
 				glBlitFramebuffer(0, 0, 1024 / 2, 768 / 2, 0, 0, 1024 / 2, 768 / 2, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 				glReadBuffer(GL_COLOR_ATTACHMENT0);
-				//glDrawBuffers(1, defaultbuff);
-				//glViewport(0, 0, 800, 700);
-
-				glBlitFramebuffer(1024/2, 0, 1024 / 2, 1024, 1024 / 2, 0, 1024 / 2, 1024, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+				glBlitFramebuffer(1024/2, 0, 1024, 768/2, 1024 / 2, 0, 1024, 768 / 2, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 				glReadBuffer(GL_COLOR_ATTACHMENT2);
-				//glDrawBuffers(1, defaultbuff);
-				//glViewport(0, 0, 800, 700);
-
 				glBlitFramebuffer(1024 / 2, 768 / 2, 1024, 768, 1024 / 2, 768 / 2, 1024, 768, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
 
-				fprintf(stdout, "----------------------------\n");
+				//fprintf(stdout, "----------------------------\n");
 				//glBindFramebuffer(gl_read_f)
 
 			}
