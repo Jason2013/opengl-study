@@ -289,8 +289,8 @@ int main()
 				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 				glDrawBuffers(3, renderbuff);
 				//fprintf(stdout, "+++++++++++++++++++++++++++\n");
-				GLenum fboStatus =  glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
-				GLenum fboStatusR = glCheckFramebufferStatus(GL_READ_FRAMEBUFFER);
+				//GLenum fboStatus =  glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+				//GLenum fboStatusR = glCheckFramebufferStatus(GL_READ_FRAMEBUFFER);
 				//fprintf(stdout, ">>>>   %d, %d, %d\n", fboStatus, fboStatusR, GL_FRAMEBUFFER_COMPLETE);
 
 				
