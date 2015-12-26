@@ -309,13 +309,26 @@ int main()
 				GLenum fboStatusR = glCheckFramebufferStatus(GL_READ_FRAMEBUFFER);
 				fprintf(stdout, "<<<<   %d, %d, %d\n", fboStatus, fboStatusR, GL_FRAMEBUFFER_COMPLETE);
 
+				glDrawBuffer(GL_BACK);
 
 				glReadBuffer(GL_COLOR_ATTACHMENT1);
-				glDrawBuffers(1, defaultbuff);
-				glViewport(0, 0, 1024, 768);
-				//glDrawBuffer(GL_BACK);
+				//glDrawBuffers(1, defaultbuff);
+				//glViewport(0, 0, 800, 700);
 
-				glBlitFramebuffer(0, 0, 1024 / 2, 768 / 2, 0, 0, 1024 / 2, 768 / 2, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+				glBlitFramebuffer(0, 0, 1024 / 2, 768 / 2, 0, 0, 1024 / 2, 768 / 2, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+				glReadBuffer(GL_COLOR_ATTACHMENT0);
+				//glDrawBuffers(1, defaultbuff);
+				//glViewport(0, 0, 800, 700);
+
+				glBlitFramebuffer(1024/2, 0, 1024 / 2, 1024, 1024 / 2, 0, 1024 / 2, 1024, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+				glReadBuffer(GL_COLOR_ATTACHMENT2);
+				//glDrawBuffers(1, defaultbuff);
+				//glViewport(0, 0, 800, 700);
+
+				glBlitFramebuffer(1024 / 2, 768 / 2, 1024, 768, 1024 / 2, 768 / 2, 1024, 768, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
 
 				fprintf(stdout, "----------------------------\n");
 				//glBindFramebuffer(gl_read_f)
